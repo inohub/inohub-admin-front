@@ -1,28 +1,33 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <Layout v-if="isAuthenticated"></Layout>
+    <Login v-else></Login>
+    <Snackbar></Snackbar>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Layout from "@/components/Layout/Layout";
+import Login from "@/components/Auth/Login";
+import Snackbar from "@/components/Utils/Snackbar";
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+  components: {
+    Snackbar,
+    Login,
+    Layout
+  },
+
+  data: () => ({
+    //
+  }),
+
+  computed: {
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated;
+    }
+  }
+};
+</script>
