@@ -47,6 +47,7 @@ const vuexStore = {
                     })
                     .catch(err => {
                         commit(AUTH_ERROR, err)
+                        console.log(err);
                         localStorage.removeItem('user-token')
                         commit('toggleSnackbar', {color : 'error', text : 'Wrong data or forbidden!'})
                         reject(err)
