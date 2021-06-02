@@ -35,7 +35,7 @@ const vuexStore = {
         [AUTH_REQUEST]: ({commit}, user) => {
             return new Promise((resolve, reject) => {
                 commit(AUTH_REQUEST)
-                axios({url: 'http://inohub-api.test/api/auth/login', data: user, method: 'POST'})
+                axios({url: 'http://api.inohub.kz/api/auth/login', data: user, method: 'POST'})
                     .then(resp => {
                         const token = resp.data.data.access_token;
                         console.log(resp);
