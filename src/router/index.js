@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import api from "@/api/api";
+// import api from "@/api/api";
 
 Vue.use(VueRouter)
 
@@ -34,18 +34,18 @@ const router = new VueRouter({
 })
 
 // eslint-disable-next-line no-unused-vars
-router.beforeEach(async(to,from,next) => {
-  if (to.name !== 'Login') {
-    try {
-      await api.get("/auth/me")
-      next()
-    } catch (err) {
-      if (err.response.status === 401) {
-        localStorage.removeItem('user-token')
-        window.location = "/login"
-      }
-    }
-  }
-})
+// router.beforeEach(async(to,from,next) => {
+//   if (to.name !== 'Login') {
+//     try {
+//       await api.get("/auth/me")
+//       next()
+//     } catch (err) {
+//       if (err.response.status === 401) {
+//         localStorage.removeItem('user-token')
+//         window.location = "/login"
+//       }
+//     }
+//   }
+// })
 
 export default router
