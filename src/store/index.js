@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from "vuex";
-import axios from "axios";
+import api from "@/api/api";
 
 Vue.use(Vuex);
 
@@ -35,7 +35,7 @@ const vuexStore = {
         [AUTH_REQUEST]: ({commit}, user) => {
             return new Promise((resolve, reject) => {
                 commit(AUTH_REQUEST)
-                axios({url: 'https://api.inohub.kz/api/auth/login', data: user, method: 'POST'})
+                api.post('/auth/login', user)
                     .then(resp => {
                         const token = resp.data.data.access_token;
                         console.log(resp);
