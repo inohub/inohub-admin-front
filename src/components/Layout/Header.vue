@@ -11,7 +11,7 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn icon>
+    <v-btn icon href="https://inohub.kz">
       <v-icon>mdi-logout</v-icon>
     </v-btn>
 
