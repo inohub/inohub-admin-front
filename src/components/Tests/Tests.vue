@@ -2,7 +2,7 @@
   <v-data-table
       :loading="loading"
       :headers="headers"
-      :items="lessons"
+      :items="tests"
       hide-default-footer
       class="elevation-1"
   >
@@ -20,53 +20,25 @@
                 v-bind="attrs"
                 v-on="on"
             >
-              Добавить урок
+              Добавить тест
             </v-btn>
           </template>
           <v-card>
             <v-card-title>
-              <span class="text-h5">Добавить урок</span>
+              <span class="text-h5">Добавить тест</span>
             </v-card-title>
 
             <v-card-text>
 
               <v-text-field
                   v-model="name"
-                  label="Название урока"
+                  label="Название теста"
               ></v-text-field>
-              <v-textarea
-                  v-model="description"
-                  label="Описание урока"
-              ></v-textarea>
-
-              <v-list>
-                <v-subheader>Контенты</v-subheader>
-                <v-list-item v-for="(item, index) in texts" :key="index">
-                  <v-card-text>
-                    <v-text-field
-                        v-model="item.title"
-                        label="Загаловок контента"
-                    ></v-text-field>
-                    <v-textarea
-                        v-model="item.content"
-                        label="Текст контента"
-                    ></v-textarea>
-                  </v-card-text>
-                </v-list-item>
-              </v-list>
 
             </v-card-text>
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn
-                  color="blue darken-1"
-                  text
-                  :loading="saveLoading"
-                  @click="addText"
-              >
-                Добавить контент
-              </v-btn>
               <v-btn
                   color="blue darken-1"
                   text
@@ -88,8 +60,8 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:item.tests_count="{ item }">
-      <v-btn link :to="`/lessons/${item.id}/tests`">{{item.tests_count}}</v-btn>
+    <template v-slot:item.questions_count="{ item }">
+      <v-btn link :to="`/tests/${item.id}/questions`">{{item.questions_count}}</v-btn>
     </template>
     <template v-slot:item.actions="{ item }">
       <v-dialog
@@ -99,44 +71,20 @@
       >
         <v-card>
           <v-card-title>
-            <span class="text-h5">Редактировать урок</span>
+            <span class="text-h5">Редактировать тест</span>
           </v-card-title>
 
           <v-card-text>
 
             <v-textarea
-                v-model="description"
-                label="Описание курса"
+                v-model="name"
+                label="Название теста"
             ></v-textarea>
-
-            <v-list>
-              <v-subheader>Контенты</v-subheader>
-              <v-list-item v-for="(item, index) in texts" :key="index">
-                <v-card-text>
-                  <v-text-field
-                      v-model="item.title"
-                      label="Загаловок контента"
-                  ></v-text-field>
-                  <v-textarea
-                      v-model="item.content"
-                      label="Текст контента"
-                  ></v-textarea>
-                </v-card-text>
-              </v-list-item>
-            </v-list>
 
           </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-                color="blue darken-1"
-                text
-                :loading="editLoading"
-                @click="addText"
-            >
-              Добавить контент
-            </v-btn>
             <v-btn
                 color="blue darken-1"
                 text
@@ -164,12 +112,12 @@
       >
         <v-icon>mdi-lead-pencil</v-icon>
       </v-btn>
-      <v-btn class="red" @click="deleteLesson(item.id)"><v-icon>mdi-delete-forever</v-icon></v-btn>
+      <v-btn class="red" @click="deleteTest(item.id)"><v-icon>mdi-delete-forever</v-icon></v-btn>
     </template>
     <template v-slot:footer>
       <v-pagination v-model="page"
                     :length="totalPaginationLength"
-                    @input="getLessons">
+                    @input="getTests">
 
       </v-pagination>
     </template>
@@ -178,10 +126,10 @@
 
 <script>
 export default {
-  name: "Lessons",
+  name: "Tests",
   mounted() {
-    this.getLessons()
-    this.$store.commit('changeHeaderName', {'name': 'Уроки'})
+    this.getTests()
+    this.$store.commit('changeHeaderName', {'name': 'Тесты'})
   },
   data() {
     return {
@@ -189,34 +137,31 @@ export default {
       headers: [
         {text: "id", value: "id"},
         {text: "Название", value: "name"},
-        {text: "Описание", value: "description"},
-        {text: "Курс", value: "course.name"},
-        {text: "Тесты", value: "tests_count"},
+        {text: "Урок", value: "lesson.name"},
+        {text: "Вопросы", value: "questions_count"},
         {text: "Дата создания", value: "created_at"},
         {text: "Действия", value: "actions"},
       ],
       tabs: [],
-      lessons :[],
+      tests :[],
       createDialog: false,
       editDialog: false,
       name: '',
-      description: '',
       saveLoading: false,
       editLoading: false,
       page: 1,
       totalPaginationLength: 0,
-      courseId: this.$route.params.id,
-      texts: [],
+      lessonId: this.$route.params.id,
       editId: null
     }
   },
   methods: {
-    getLessons() {
+    getTests() {
       this.loading = true;
-      let url = `/lessons?search[course_id]=exact|${this.courseId}&relation[course]&relation[texts]&count[]=tests&page=${this.page}`;
+      let url = `/tests?search[lesson_id]=exact|${this.lessonId}&relation[lesson]&count[]=questions&page=${this.page}`;
       this.$http.get(url)
           .then(resp => {
-            this.lessons = resp.data.data.data;
+            this.tests = resp.data.data.data;
             this.totalPaginationLength = Math.floor(resp.data.data.total / 20);
             this.loading = false;
           })
@@ -227,32 +172,27 @@ export default {
     },
     openEditDialog(item) {
       this.editDialog = true;
-      this.description = item.description;
-      this.texts = item.texts;
+      this.name = item.name;
       this.editId = item.id;
     },
     close() {
       this.createDialog = false;
       this.editDialog = false;
       this.name = '';
-      this.description = '';
-      this.texts = [];
       this.editId = null;
     },
     save() {
       this.saveLoading = true;
 
-      const {courseId, name, description, texts} = this;
+      const {lessonId, name} = this;
 
       this.$http
-          .post('lessons', {
-            course_id: courseId,
-            name,
-            description,
-            texts
+          .post('tests', {
+            lesson_id: lessonId,
+            name
           })
           .then(() => {
-            this.getLessons();
+            this.getTests();
             this.saveLoading = false;
           })
           .catch(err => {
@@ -268,18 +208,16 @@ export default {
     },
     edit() {
       this.editLoading = true;
-      let item = this.lessons.find(v => v.id === this.editId);
+      let item = this.tests.find(v => v.id === this.editId);
 
-      const {courseId, description, texts} = this;
+      const {name} = this;
 
       this.$http
-          .put(`lessons/${item.id}`, {
-            course_id: courseId,
-            description,
-            texts
+          .put(`tests/${item.id}`, {
+            name
           })
           .then(() => {
-            this.getLessons();
+            this.getTests();
             this.editLoading = false;
           })
           .catch(err => {
@@ -293,21 +231,18 @@ export default {
 
       this.close();
     },
-    deleteLesson(id) {
-      this.$http.delete(`/lessons/${id}`)
+    deleteTest(id) {
+      this.$http.delete(`/tests/${id}`)
           .then(() => {
-            this.getLessons();
+            this.getTests();
           })
           .catch(err => {
             this.$store.commit('toggleSnackbar', {text: err.message, color: "error"})
             this.loading = false;
           })
     },
-    addText() {
-      this.texts.push({'title': '', 'content': ''});
-    },
     paginate() {
-      this.getLessons()
+      this.getTests()
     }
   }
 }

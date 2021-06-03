@@ -45,7 +45,7 @@ export default {
       this.$http.get('/startups?relation[owner]')
           .then(response => {
             this.loading = false;
-            this.startups = response.data.data;
+            this.startups = response.data.data.data;
             console.log(response)
           })
           .catch(error => {

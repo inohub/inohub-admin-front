@@ -5,6 +5,7 @@
       :items="courses"
       hide-default-footer
       class="elevation-1"
+      :items-per-page="20"
   >
     <template v-slot:top>
       <v-toolbar flat>
@@ -67,17 +68,6 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <!--        <v-dialog v-model="dialogDelete" max-width="500px">-->
-        <!--          <v-card>-->
-        <!--            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>-->
-        <!--            <v-card-actions>-->
-        <!--              <v-spacer></v-spacer>-->
-        <!--              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>-->
-        <!--              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>-->
-        <!--              <v-spacer></v-spacer>-->
-        <!--            </v-card-actions>-->
-        <!--          </v-card>-->
-        <!--        </v-dialog>-->
       </v-toolbar>
     </template>
     <template v-slot:footer>
@@ -88,7 +78,63 @@
       </v-pagination>
     </template>
     <template v-slot:item.lessons_count="{ item }">
-        <v-btn link :to="'/courses/'+item.id+'/lessons'">{{item.lessons_count}}</v-btn>
+        <v-btn link :to="`/courses/${item.id}/lessons`">{{item.lessons_count}}</v-btn>
+    </template>
+    <template v-slot:item.actions="{ item }">
+      <v-dialog
+          :retain-focus="false"
+          v-model="editDialog"
+          max-width="500px"
+      >
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Редактировать курс</span>
+          </v-card-title>
+
+          <v-card-text>
+
+            <v-textarea
+                v-model="description"
+                label="Описание курса"
+            ></v-textarea>
+
+            <v-checkbox
+                v-model="is_publish"
+                label="Запустить на платформу"
+            ></v-checkbox>
+
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                color="blue darken-1"
+                text
+                :loading="editLoading"
+                @click="close"
+            >
+              Отмена
+            </v-btn>
+            <v-btn
+                color="blue darken-1"
+                text
+                :loading="editLoading"
+                @click="edit"
+            >
+              Изменить
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-btn
+          @click="openEditDialog(item)"
+          color="blue"
+          dark
+          class="mb-2"
+      >
+        <v-icon>mdi-lead-pencil</v-icon>
+      </v-btn>
+      <v-btn class="red" @click="deleteCourse(item.id)"><v-icon>mdi-delete-forever</v-icon></v-btn>
     </template>
   </v-data-table>
 </template>
@@ -99,7 +145,6 @@ export default {
   mounted() {
     this.getCourses()
     this.$store.commit('changeHeaderName', {'name': 'Курсы'})
-    console.log('courses')
   },
   data() {
     return {
@@ -115,22 +160,24 @@ export default {
       ],
       courses: [],
       createDialog: false,
+      editDialog: false,
       name: '',
       is_publish: false,
       description: '',
       saveLoading: false,
+      editLoading: false,
       page: 1,
-      totalPaginationLength: 0
+      totalPaginationLength: 0,
+      editId: null
     }
   },
   methods: {
     getCourses() {
       this.loading = true;
-      console.log('lol')
       this.$http.get('/courses?count[]=lessons&page=' + this.page)
           .then(resp => {
             this.courses = resp.data.data.data;
-            this.totalPaginationLength = resp.data.data.last_page
+            this.totalPaginationLength = Math.ceil(resp.data.data.total / 20);
             this.loading = false;
           })
           .catch(err => {
@@ -138,8 +185,19 @@ export default {
             this.loading = false;
           })
     },
+    openEditDialog(item) {
+      this.editDialog = true;
+      this.description = item.description;
+      this.is_publish = item.is_publish;
+      this.editId = item.id;
+    },
     close() {
-      this.createDialog = false
+      this.createDialog = false;
+      this.editDialog = false;
+      this.name = '';
+      this.description = '';
+      this.is_publish = false;
+      this.editId = false;
     },
     save() {
       this.saveLoading = true;
@@ -150,11 +208,47 @@ export default {
         name,
         description,
         is_publish
-      })
+      });
+
+      this.saveLoading = false;
+
+      this.close();
+
+      this.getCourses();
+    },
+    edit() {
+      let item = this.courses.find(v => v.id === this.editId);
+      this.editLoading = true;
+
+      const {description, is_publish} = this;
+
+      this.$http
+          .put(`courses/${item.id}`, {
+            description,
+            is_publish
+          })
+          .then(() => {
+            item.description = description;
+            item.is_publish = is_publish;
+          })
+          .catch(err => {
+            this.$store.commit('toggleSnackbar', {text: err.message, color: "error"})
+            this.editLoading = false;
+          });
+
       this.close()
     },
+    deleteCourse(id) {
+      this.$http.delete(`/courses/${id}`)
+        .then(() => {
+          this.getCourses();
+        })
+        .catch(err => {
+          this.$store.commit('toggleSnackbar', {text: err.message, color: "error"})
+          this.loading = false;
+        })
+    },
     paginate() {
-      console.log('lol')
       this.getCourses()
     }
   }

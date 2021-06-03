@@ -6,7 +6,7 @@ const PROD = 'https://api.inohub.kz/api'
 const DEV = 'http://inohub-api.test/api';
 
 let instance = axios.create({
-    baseURL : DEV
+    baseURL : PROD
 });
 
 instance.interceptors.request.use(function (config) {
