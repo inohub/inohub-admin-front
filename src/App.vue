@@ -21,8 +21,12 @@ export default {
   },
 
   data: () => ({
-    //
+
   }),
+
+  methods: {
+
+  },
 
   computed: {
     isAuthenticated() {

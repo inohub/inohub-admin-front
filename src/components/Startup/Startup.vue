@@ -4,7 +4,6 @@
         :loading="loading"
         :headers="headers"
         :items="startups"
-        :items-per-page="5"
         class="elevation-1"
         hide-default-footer
     >
@@ -27,7 +26,7 @@
 export default {
   name: "Startup",
   mounted() {
-    this.$store.commit('changeHeaderName', {'name': 'Стартапы'})
+    this.$store.commit('changeHeaderName', {'name': 'Заявки стартапов'})
     this.getStartups()
   },
   data() {

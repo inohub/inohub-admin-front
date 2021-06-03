@@ -31,7 +31,9 @@ export default {
     return {
       items: [
         { title: 'Главная', icon: 'mdi-view-dashboard', route: "/"},
-        { title: 'Стартапы', icon: 'mdi-account-alert', route:"/startups"},
+        { title: 'Стартапы', icon: 'mdi-google-my-business', route: "/all-startups"},
+        { title: 'Заявки стартапов', icon: 'mdi-account-alert', route:"/startups"},
+        { title: 'Курсы', icon: 'mdi-book', route:"/courses"},
       ]
     }
   },

@@ -8,17 +8,32 @@ const routes = [
   {
     path: '/',
     name: 'Dashboard',
-    component: () => import(/* webpackChunkName: "dashboard" */ '../components/Dashboard/Dashboard.vue')
+    component: () => import('../components/Dashboard/Dashboard.vue')
+  },
+  {
+    path: '/all-startups',
+    name: 'StartupsAll',
+    component: () => import('../components/Startup/AllStartups')
   },
   {
     path: '/startups',
     name: 'Startups',
-    component: () => import(/* webpackChunkName: "dashboard" */ '../components/Startup/Startup')
+    component: () => import('../components/Startup/Startup')
   },
   {
     path: '/startups/:id',
     name: 'StartupShow',
-    component: () => import(/* webpackChunkName: "dashboard" */ '../components/Startup/Show')
+    component: () => import('../components/Startup/Show')
+  },
+  {
+    path: '/courses',
+    name: 'Courses',
+    component: () => import('../components/Course/Courses')
+  },
+  {
+    path: '/courses/:id/lessons',
+    name: 'Lessons',
+    component: () => import('../components/Lessons/Lessons')
   },
   {
     path: '/login',

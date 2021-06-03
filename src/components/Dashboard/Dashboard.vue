@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-row align-content="center">
-      <v-card>
+    <v-row class="d-flex">
+      <v-card :loading="loadingChart">
         <v-sheet
             class="v-sheet--offset mx-auto"
             color="#00b0fc"
@@ -47,7 +47,7 @@
 
         <v-expand-transition>
           <v-card
-              max-width="calc(100%)"
+              max-width=""
               v-if="infoCards.users.chartReveal"
               class="transition-fast-in-fast-out"
           >
@@ -57,8 +57,59 @@
           </v-card>
         </v-expand-transition>
       </v-card>
-      <v-card>
+      <v-card
+          :loading="loadingInvestor"
+          class="mx-auto"
+          max-width="344"
+      >
+        <v-img
+            src="https://www.insidehighered.com/sites/default/server_files/media/iStock-900872896_0.jpg"
+            height="200px"
+        ></v-img>
 
+        <v-card-title>
+            самый щедрый инвестор:
+        </v-card-title>
+
+        <v-card-subtitle>
+          {{user.profile.first_name +" "+  user.profile.last_name}} c пожертвованием суммы более чем {{user.donations_sum_amount}} KZT
+        </v-card-subtitle>
+      </v-card>
+      <v-card
+          :loading="loadingInvestor"
+          class="mx-auto"
+          max-width="344"
+      >
+        <v-img
+            src="https://www.insidehighered.com/sites/default/server_files/media/iStock-900872896_0.jpg"
+            height="200px"
+        ></v-img>
+
+        <v-card-title>
+            самый щедрый инвестор:
+        </v-card-title>
+
+        <v-card-subtitle>
+          {{user.profile.first_name +" "+  user.profile.last_name}} c пожертвованием суммы более чем {{user.donations_sum_amount}} KZT
+        </v-card-subtitle>
+      </v-card>
+      <v-card
+          :loading="loadingInvestor"
+          class="mx-auto"
+          max-width="344"
+      >
+        <v-img
+            src="https://www.insidehighered.com/sites/default/server_files/media/iStock-900872896_0.jpg"
+            height="200px"
+        ></v-img>
+
+        <v-card-title>
+            самый щедрый инвестор:
+        </v-card-title>
+
+        <v-card-subtitle>
+          {{user.profile.first_name +" "+  user.profile.last_name}} c пожертвованием суммы более чем {{user.donations_sum_amount}} KZT
+        </v-card-subtitle>
       </v-card>
     </v-row>
   </div>
@@ -69,6 +120,8 @@ export default {
   name: "Dashboard",
   data() {
     return {
+      loadingChart: false,
+      loadingInvestor: false,
       infoCards: {
         users: {
           totalAmount: 0,
@@ -96,14 +149,32 @@ export default {
         0,
         0,
       ],
+      user: {}
     }
   },
   mounted() {
     this.$store.commit('changeHeaderName', {'name' : 'Главная'})
+    this.loadingChart = true;
     this.$http.get('/admin/dashboard/get-users-card-details')
         .then((resp) => {
+          this.loadingChart = false;
           console.log(resp.data);
         })
+    this.getInvestor()
+  },
+  methods: {
+    getInvestor() {
+      this.loadingInvestor = true;
+      this.$http.get('/admin/dashboard/get-top-investor')
+          .then(resp => {
+            this.loadingInvestor = false;
+            this.user = resp.data.data;
+            console.log(resp.data)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+    }
   }
 }
 </script>
