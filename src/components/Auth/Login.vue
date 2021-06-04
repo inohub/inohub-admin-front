@@ -5,7 +5,6 @@
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4>
             <v-card class="elevation-12">
-              <v-card-title>email: ondricka.bernie@example.net |  password: password</v-card-title>
               <v-toolbar dark color="#b19ae8">
                 <v-toolbar-title>Inohub administration</v-toolbar-title>
               </v-toolbar>
